@@ -24,12 +24,12 @@ else
 			;;
 		 [Nn]* )
       			echo "======================"
-			echo "Deleting Canceled!"
+			echo "Cancel delete!"
       			echo "======================"
 			;;
 		 * ) 
 		 	echo "===================="
-			echo "Please choice y/n"
+			echo "Please choose y/n"
 			echo "===================="
 			;;
 	esac
