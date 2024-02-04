@@ -1,9 +1,11 @@
 #!/bin/bash
 read -p "Enter name of database: " $database_name
+result=`./check_valid_value.sh $database_name`
 
 database_path="./DataBases/$database_name"
 
 if [ ! -d "$database_path" ]; 
+
 then
   echo "--------------------------------------"
   echo "Database $database_name doesn't exist!"

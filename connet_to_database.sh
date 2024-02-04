@@ -1,21 +1,27 @@
- #!/bin/bash
- read -p "Enter Database Name: " $database_name
-   
-if [ $? -eq 0 ]
+##!/bin/bash
+ read -p "Please enter database name " $database_name
+
+result=`./check_valid_value.sh $database_name`
+
+if [[ $result ]]
 
   then
-    echo "-----------------------------------------"
-    echo "Connected to $database_name Successfully!"
-    echo "-----------------------------------------"
+  echo "-------------------------------------"
+  echo $result
+  echo "-------------------------------------"
+  
+  ./connet_to_database.sh
+
+# Check if the database_name is present in the Directory
+elif [[ -d ./Databases/$database_name ]];
+  then
+    echo "-------------------------------------"
+    echo cd ./Databases/$database_name 
+    echo "-------------------------------------"
 
     ./table_menu.sh
 
   else
     echo "----------------------------------"
-    echo "Database $database_name not found!"
-    echo "----------------------------------"
-    
-    ./main.sh
 
-fi
        
