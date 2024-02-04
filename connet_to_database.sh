@@ -19,6 +19,7 @@ if [ $? -eq 0 ]
     echo "================================"
     echo "Database $database_name not found!"
     echo "================================"
+    
     ./main.sh
 
 fi
