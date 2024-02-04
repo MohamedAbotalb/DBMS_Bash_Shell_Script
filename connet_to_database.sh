@@ -1,24 +1,19 @@
  #!/bin/bash
- echo -e "Enter Database Name: \c"
- read -r database_name
-
-  cd ./DataBases/$database_name 2> /dev/null
-  
+ read -p "Enter Database Name: " $database_name
+   
 if [ $? -eq 0 ]
 
   then
-    echo "========================================="
+    echo "-----------------------------------------"
     echo "Connected to $database_name Successfully!"
-    echo "========================================="
-    cd ..
-    cd ..
-    
-    ./main.sh
+    echo "-----------------------------------------"
+
+    ./table_menu.sh
 
   else
-    echo "================================"
+    echo "----------------------------------"
     echo "Database $database_name not found!"
-    echo "================================"
+    echo "----------------------------------"
     
     ./main.sh
 
