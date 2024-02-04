@@ -1,37 +1,34 @@
 #!/bin/bash
-echo -e "Enter a database name to delete: \c"
-read database_name
+read -p "Enter name of database: " $database_name
+
 database_path="./DataBases/$database_name"
 
 if [ ! -d "$database_path" ]; 
 then
-  echo "==================================="
+  echo "--------------------------------------"
   echo "Database $database_name doesn't exist!"
-
-  echo "==================================="
+  echo "--------------------------------------"
 
     ./main.sh
 
 else
-  
-  echo -e "Are you Sure You Want To delete $database_name Database? y/n \c"
-  read choice;
+  read -p "Are you Sure You Want To delete $database_name Database? y/n " $choice ;
 	case $choice in
 		 [Yy]* ) 
 			rm -r "$database_path"
-			echo "============================================"
+				echo "---------------------------------------------"
          		echo "Database $database_name deleted successfully!"
-         		echo "============================================"
+         		echo "---------------------------------------------"
 			;;
 		 [Nn]* )
-      			echo "======================"
+      			echo "----------------------"
 			echo "Cancel delete!"
-      			echo "======================"
+      			echo "----------------------"
 			;;
 		 * ) 
-		 	echo "===================="
+		 	echo "--------------------------"
 			echo "Please choose y/n"
-			echo "===================="
+			echo "--------------------------"
 			;;
 	esac
   
