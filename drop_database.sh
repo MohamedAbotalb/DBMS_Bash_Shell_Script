@@ -1,6 +1,6 @@
 #!/bin/bash
 echo -e "Enter a database name to delete: \c"
-read db_name
+read database_name
 database_path="./DataBases/$database_name"
 
 if [ ! -d "$database_path" ]; 
