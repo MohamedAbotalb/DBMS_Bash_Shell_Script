@@ -7,6 +7,7 @@ if [ ! -d "$database_path" ];
 then
   echo "==================================="
   echo "Database $database_name doesn't exist!"
+
   echo "==================================="
 
     ./main.sh
