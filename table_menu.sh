@@ -3,7 +3,7 @@
 database_name=$1
 
 echo "-------------------------------------"
-echo "WELCOME TO $database_name Database:"
+echo "WELCOME TO $database_name DATABASE:"
 echo "-------------------------------------"
 
 PS3="Choose what you want: "
