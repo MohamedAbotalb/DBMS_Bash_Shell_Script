@@ -6,11 +6,12 @@ then
   echo "-------------------------------------"
   ls Databases
   echo "-------------------------------------"
-  ./main.sh
 
 else
   echo "-------------------------------------"
   echo "There is no Database found"
   echo "-------------------------------------"
-  ./main.sh
+
 fi
+
+./main.sh
