@@ -97,13 +97,13 @@ else
     
     if [[ i -eq $columns ]]; 
     then
-			echo $name >> $metadata_dir/$table_name.meta
-			echo $datatype >> $metadata_dir/$table_name.dtype
+      echo $name >> $metadata_dir/$table_name.meta
+      echo $datatype >> $metadata_dir/$table_name.dtype
 
-		else
-			echo -n $name":" >> $metadata_dir/$table_name.meta
-			echo -n $datatype":" >> $metadata_dir/$table_name.dtype
-		fi
+    else
+      echo -n $name":" >> $metadata_dir/$table_name.meta
+      echo -n $datatype":" >> $metadata_dir/$table_name.dtype
+    fi
   done
 
   # set the primary key to a specific column 
