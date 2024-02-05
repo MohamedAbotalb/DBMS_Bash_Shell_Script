@@ -1,4 +1,5 @@
 #!/bin/bash
+
 read -p "Enter name of database: " database_name
 result=`./check_valid_value.sh $database_name`
 
