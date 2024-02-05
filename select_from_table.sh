@@ -9,7 +9,6 @@ result=`./check_valid_value.sh $table_name`
 
 if [[ $result ]];
     echo ""
-
 # Ask the user what they want to select
 echo "What do you want to select?"
 echo "1. Whole file"
