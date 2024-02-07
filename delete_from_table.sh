@@ -1,13 +1,21 @@
 #!/bin/bash
 
-# Ask the user for the primary key
-read -p "Enter the primary key to delete: " primary_key
+database_name=$1
+database_dir=./Databases/$database_name
 
+			read -p "Enter the name of table you want to delete from: " table_name
+			 until [[ -f ./Databases/$1/$table_name ]]
+                        do
+                                read -p "Record does't Exist, Re-Enter the Table you want to delete from: " table_name
+                        done
 
-    if [ -n "$row_number" ]; then
-            # If the primary key is found, delete the corresponding row in the table file
-            sed -i "${row_number}d" table.txt
-            echo "Row with primary key $primary_key deleted successfully."
-        else
-            echo "Primary key $primary_key not found in the table."
-    fi
+		 	 read -p "Enter Record Primary Key: " pk
+			 pk=$(cut -f 1 -d: ./Databases/$1/$table_name | grep -w ^$pk)
+			 until [[ $pk ]] 
+                      	 do
+                    		  echo "This Primary Key doesn't Exist" 
+                                  read -p "Enter another Value for PK: " pk
+                                  pk=$(cut -f 1 -d":" ./Databases/$1/$table_name | grep -w ^$pk)
+                         done
+			sed -i  "/^$pk/d"   ~/database/$1/$table_name
+			echo "Record was Deleted Successfully"
