@@ -76,7 +76,7 @@ else
         read -p "Enter the value of $name: " value
       fi
 
-      if [[ $type = "int" && "$value" = +([0-9]) || $type = "string" && "$value" = +([a-zA-Z]) ]]; 
+      if [[ $type = "int" && "$value" = +([0-9]) || $type = "string" && "$value" = +([a-zA-Z@.]) ]]; 
       then
 
       # Check for duplicate primary key value
@@ -110,9 +110,9 @@ else
   do
     if [[ $i != $(($length - 1)) ]]; 
     then
-        echo -n "${real_data[$i]}:" >> "$table_name_path"
+      echo -n "${real_data[$i]}:" >> "$table_name_path"
     else
-        echo "${real_data[$i]}" >> "$table_name_path"
+      echo "${real_data[$i]}" >> "$table_name_path"
     fi
   done
 
