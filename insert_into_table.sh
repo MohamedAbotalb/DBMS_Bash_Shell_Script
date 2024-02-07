@@ -120,4 +120,6 @@ else
   echo "Data Inserted Successfully"
   echo "-------------------------------------"
 
+  ./table_menu.sh $database_name
+
 fi
