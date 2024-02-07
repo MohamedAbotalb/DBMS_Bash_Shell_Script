@@ -119,5 +119,6 @@ else
   echo "-------------------------------------"
   echo "Data Inserted Successfully"
   echo "-------------------------------------"
+  ./table_menu.sh
 
 fi
