@@ -1,36 +1,31 @@
 #!/bin/bash
 
-database_name=$1
+# Ask user to input an ID to update
+read -p "Enter the ID you want to update: " selected_id
 
-read -p "Enter table name you want to select from: " table_name
-table_path=DataBases/$database_name/$table_name
-
-result=`./check_valid_value.sh $table_name`
-
-if [[ $result ]];
-    echo ""
-# Ask the user what they want to select
-echo "What do you want to select?"
-echo "1. Whole file"
-echo "2. One row"
-read -p "Enter your choice : " choice
-
-if [ "$choice" == "1" ]; then
-    # Display the whole students file
-    head -1 ./Databases/$database_name/.metadata/$table_name
-    cat $table_path
-elif [ "$choice" == "2" ]; then
-    # Ask the user to enter the value of the primary key
-    read -p "Enter the value of the primary key: " primary_key
-
-    # Find the corresponding row in the students file
-    row=$(grep "$Pk" ./Databases/$databas_name/$table_name)
-
-    # Display metadata as the first line and the corresponding row
-    echo "$(head -1 Databases/.metadata/$database_name/$table_name.meta)"
-    echo "$row"
-else
-    echo "Invalid choice. Exiting."
-    ./select_from_table.sh
+# Validate if the selected ID exists in the file
+if ! grep -q "^$selected_id :" ./Databases/iti/students/.metadata; then
+    echo "Invalid ID. Exiting."
+    exit 1
 fi
 
+# Display the selected row
+echo "Selected row:"
+awk -F ' : ' -v id="$selected_id" '$1 == id {print $0}' file
+
+# Ask user which field to update
+read -p "Which field do you want to update : " field_to_update
+
+# Validate the field input
+if [ "$field_to_update" != "name" ] && [ "$field_to_update" != "email" ]; then
+    echo "Invalid field. Exiting."
+    exit 1
+fi
+
+# Ask user for the new value
+read -p "Enter the new $field_to_update: " new_value
+
+# Update the data in the file
+awk -F ' : ' -v id="$selected_id" -v field="$field_to_update" -v value="$new_value" 
+
+echo "Data updated successfully."
