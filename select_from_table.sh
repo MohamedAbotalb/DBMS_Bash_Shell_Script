@@ -34,4 +34,3 @@ else
     ./select_from_table.sh
 fi
 
-exit 0
