@@ -4,7 +4,7 @@ database_name=$1
 database_dir=./Databases/$database_name
 
 			read -p "Enter the name of table you want to delete from: " table_name
-			 until [[ -f ./Databases/$1/$table_name ]]
+			until [[ -f ./Databases/$1/$table_name ]]
                         do
                                 read -p "Record does't Exist, Re-Enter the Table you want to delete from: " table_name
                         done
