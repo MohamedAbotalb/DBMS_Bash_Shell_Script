@@ -1,5 +1,3 @@
-4. list_databases
-
 #!/bin/bash
 
 # List available databases
