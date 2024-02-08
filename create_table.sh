@@ -3,6 +3,14 @@
 database_name=$1
 database_dir=./Databases/$database_name
 
+if [[ $(ls $database_dir) ]];
+then
+  echo "-------------------------------------"
+  echo "Available tables in $database_name:"
+  ls $database_dir
+  echo "-------------------------------------" 
+fi
+
 read -p "Enter the table name: " table_name
 
 result=`./check_valid_value.sh $table_name`
@@ -54,11 +62,28 @@ else
     do
       read -p "Enter the name of column $i: " name
 
+      flag=0
       if [[ $name =~ ^[a-zA-Z]{2,}[a-zA-Z_]*$ || $name =~ *" "* ]]
         then
-          metadata+=("$name")
-          break
+          # Check if the entered column name is present before in the table or not
+          for meta in "${metadata[@]}";
+          do
+            if [[ "$name" = "$meta" ]];
+            then
+              flag=1
+              break
+            fi
+          done
 
+          if [[ $flag = 0 ]];
+          then
+            metadata+=("$name")
+            break
+          else
+            echo "-------------------------------------"
+            echo "$name column is present before in the table, enter a new column name"
+            echo "-------------------------------------"
+          fi
       else
         echo "-------------------------------------"
         echo "Invalid column name"
