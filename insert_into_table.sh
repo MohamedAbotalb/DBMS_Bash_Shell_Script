@@ -4,10 +4,20 @@ database_name=$1
 database_dir=./Databases/$database_name
 metadata_dir=$database_dir/.metadata
 
-echo "-------------------------------------"
-echo "Available tables in $database_name:"
-ls $database_dir
-echo "-------------------------------------"
+if [[ $(ls $database_dir) ]];
+then
+  echo "-------------------------------------"
+  echo "Available Tables in $database_name:"
+  ls $database_dir
+  echo "-------------------------------------"
+
+else
+  echo "-------------------------------------"
+  echo "There is no tables found"
+  echo "-------------------------------------"
+
+  ./table_menu.sh $database_name
+fi
 
 read -p "Enter the table name: " table_name
 
@@ -71,9 +81,9 @@ else
     do
       # check if the column is the primary key
       if [[ "$name" = "$pk" ]]; then
-        read -p "Enter the value of Primary Key $name: " value
+        read -p "Enter the value of Primary Key [$name]: " value
       else
-        read -p "Enter the value of $name: " value
+        read -p "Enter the value of [$name]: " value
       fi
 
       if [[ $type = "int" && "$value" = +([0-9]) || $type = "string" && "$value" = +([a-zA-Z@.]) ]]; 
