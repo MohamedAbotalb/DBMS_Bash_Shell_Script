@@ -98,11 +98,7 @@ else
             then 
               
               # Get the PK values to check if the entered value is present or not
-              pk_values=()
-              while IFS=: read -r -a fields; 
-              do
-                pk_values+=("${fields[$index]}")
-              done < "$table_name_path"
+              pk_values=($(awk -F: "{print \$($index+1)}" "$table_name_path"))
 
               # Check if the PK value is present or not
               flag=0
