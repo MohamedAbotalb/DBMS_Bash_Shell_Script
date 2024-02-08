@@ -17,5 +17,5 @@ database_dir=./Databases/$database_name
                                   read -p "Enter another Value for PK: " pk
                                   pk=$(cut -f 1 -d":" ./Databases/$1/$table_name | grep -w ^$pk)
                          done
-			sed -i  "/^$pk/d"   ~/database/$1/$table_name
+			sed -i  "/^$pk/d"   ./Databases/$1/$table_name
 			echo "Record was Deleted Successfully"
