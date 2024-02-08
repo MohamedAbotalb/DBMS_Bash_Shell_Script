@@ -20,7 +20,7 @@ then
   echo $result
   echo "-------------------------------------"
 
-  ./select.sh $database_name
+  ./select_from_table.sh $database_name
 
 # Check if the table name isn't present in the selected database
 elif [[ ! -f $database_dir/$table_name ]];
@@ -29,7 +29,7 @@ then
   echo "$table_name isn't present, please enter a new name"
   echo "-------------------------------------"
 
-  ./select.sh $database_name
+  ./select_from_table.sh $database_name
 
 else
   table_name_path=$database_dir/$table_name
