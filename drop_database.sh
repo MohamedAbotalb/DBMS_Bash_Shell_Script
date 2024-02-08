@@ -30,30 +30,35 @@ then
   ./drop_database.sh
 
 else
-  read -p "Are you Sure You Want To delete $database_name Database? y/n " choice
+	while true;
+	do
+		read -p "Are you Sure You Want To delete $database_name Database? y/n " choice
 
-	case $choice in
+		case $choice in
 
-		[Yy] ) 
-			rm -r "$database_path"
-			echo "---------------------------------------------"
-			echo "Database $database_name deleted successfully!"
-			echo "---------------------------------------------"
-			;;
+			[Yy] ) 
+				rm -r "$database_path"
+				echo "---------------------------------------------"
+				echo "Database $database_name deleted successfully!"
+				echo "---------------------------------------------"
+				break
+				;;
 
-		[Nn] )
-			echo "----------------------"
-			echo "Cancel delete!"
-			echo "----------------------"
-			;;
+			[Nn] )
+				echo "----------------------"
+				echo "Cancel delete!"
+				echo "----------------------"
+				break
+				;;
 
-		* ) 
-			echo "--------------------------"
-			echo "Please choose y/n"
-			echo "--------------------------"
-			;;
-	esac
-  
+			* ) 
+				echo "--------------------------"
+				echo "Please choose y/n"
+				echo "--------------------------"
+				;;
+		esac
+	done
+
   ./main.sh
 
 fi
