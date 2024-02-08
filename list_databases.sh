@@ -4,6 +4,7 @@
 if [[ $(ls Databases) ]];
 then
   echo "-------------------------------------"
+  echo "Available databases:"
   ls Databases
   echo "-------------------------------------"
 
