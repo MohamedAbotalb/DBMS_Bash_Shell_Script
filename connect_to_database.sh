@@ -1,5 +1,3 @@
-1. connect_to_database.sh file
-
 #!/bin/bash
 
 get_database_name() {

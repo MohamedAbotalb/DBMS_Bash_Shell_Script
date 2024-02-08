@@ -1,5 +1,3 @@
-2. create_database.sh file
-
 #!/bin/bash
 
 get_database_name() {

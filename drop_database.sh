@@ -1,5 +1,3 @@
-3. drop_database.sh file
-
 #!/bin/bash
 
 # List available databases
