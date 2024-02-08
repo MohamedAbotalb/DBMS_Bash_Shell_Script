@@ -23,8 +23,8 @@ Once connected to a specific database, the user will encounter a new menu with t
 3. **Drop Table:** Delete a table and its contents.
 4. **Insert into Table:** Add new records to a table, ensuring data integrity with specified column data types.
 5. **Select From Table:** Retrieve and display rows from a table in a readable format.
-6. **Delete From Table:** Remove specific rows from a table.
-7. **Update Table:** Modify existing records in a table, ensuring compatibility with specified data types and primary key constraints.
+6. **Delete Record:** Remove specific rows from a table.
+7. **Update Record:** Modify existing records in a table, ensuring compatibility with specified data types and primary key constraints.
 
 # How to use it:
 1. open the terminal from any linux distribution
