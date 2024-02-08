@@ -1,64 +1,89 @@
+3. drop_database.sh file
+
 #!/bin/bash
 
-echo "-------------------------------------"
-echo "Available Databases:"
-ls ./Databases
-echo "-------------------------------------"
-
-read -p "Enter name of database: " database_name
-
-result=`./check_valid_value.sh $database_name`
-
-database_path="./Databases/$database_name"
-
-# check if database name is not valid
-if [[ $result ]];
-then
+# List available databases
+list_databases() {
   echo "-------------------------------------"
-  echo $result
+  echo "Available Databases:"
+  ls ./Databases
   echo "-------------------------------------"
+}
 
-  ./drop_database.sh
+# Ask the user to enter database name
+get_database_name() {
+  read -p "Enter name of database: " database_name
+}
 
-# Check if the database name doesn't match anyone in the databases
-elif [ ! -d "$database_path" ]; 
-then
-  echo "--------------------------------------"
-  echo "Database $database_name doesn't exist!"
-  echo "--------------------------------------"
+# Check if the database name is valid
+check_valid_database() {
+  local database_name="$1"
+  local result=$(./check_valid_value.sh "$database_name")
 
-  ./drop_database.sh
+  if [[ $result ]]; 
+	then
+    echo "-------------------------------------"
+    echo "$result"
+    echo "-------------------------------------"
 
-else
-	while true;
+    main
+  fi
+}
+
+check_database_exists() {
+  local database_name="$1"
+  local database_path="./Databases/$database_name"
+
+  if [ ! -d "$database_path" ]; then
+    echo "--------------------------------------"
+    echo "Database $database_name doesn't exist!"
+    echo "--------------------------------------"
+
+    main
+  fi
+}
+
+drop_database() {
+  local database_name="$1"
+  local database_path="./Databases/$database_name"
+
+  while true; 
 	do
-		read -p "Are you Sure You Want To delete $database_name Database? y/n " choice
+    read -p "Are you Sure You Want To delete $database_name Database? y/n " choice
+    case $choice in
 
-		case $choice in
-
-			[Yy] ) 
-				rm -r "$database_path"
-				echo "---------------------------------------------"
-				echo "Database $database_name deleted successfully!"
-				echo "---------------------------------------------"
-				break
+      [Yy] ) 
+        rm -r "$database_path"
+        echo "---------------------------------------------"
+        echo "Database $database_name is deleted successfully!"
+        echo "---------------------------------------------"
+        break 
 				;;
 
-			[Nn] )
-				echo "----------------------"
-				echo "Cancel delete!"
-				echo "----------------------"
-				break
+      [Nn] )
+        echo "---------------------------------------------"
+        echo "Cancel delete!"
+        echo "---------------------------------------------"
+        break 
 				;;
 
-			* ) 
-				echo "--------------------------"
-				echo "Please choose y/n"
-				echo "--------------------------"
+      * ) 
+        echo "---------------------------------------------"
+        echo "Please choose y/n"
+        echo "---------------------------------------------" 
 				;;
-		esac
-	done
+    esac
+  done
+	./main.sh
+}
 
-  ./main.sh
+# Create main function to exectue all functions
+main() {
+  list_databases
+  get_database_name
+  check_valid_database "$database_name"
+  check_database_exists "$database_name"
+  drop_database "$database_name"
+}
 
-fi
+main
