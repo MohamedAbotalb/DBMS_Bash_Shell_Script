@@ -3,10 +3,20 @@
 database_name=$1
 database_dir=./Databases/$database_name
 
-echo "-------------------------------------"
-echo "Available Tables in $database_name:"
-ls $database_dir
-echo "-------------------------------------"
+if [[ $(ls $database_dir) ]];
+then
+  echo "-------------------------------------"
+  echo "Available Tables in $database_name:"
+  ls $database_dir
+  echo "-------------------------------------"
+
+else
+  echo "-------------------------------------"
+  echo "There is no tables found"
+  echo "-------------------------------------"
+
+  ./table_menu.sh $database_name
+fi
 
 read -p "Enter the table name you want to update: " table_name
 
@@ -102,8 +112,6 @@ else
             fi
           done < "$table_name_path"
 
-          echo $old_row
-
           # Ask the user to enter the column name to update its value
           read -p "Enter the column name you want to update its value [ ${metadata[*]} ]: " column_name
 
@@ -175,11 +183,9 @@ else
 
     # old_row => new_row with the updated value
     new_row=$(echo "$old_row" | awk -F: -v new_val="$value" -v pos="$position" '{$(pos+1) = new_val} 1' | sed 's/ /:/g')
-    echo $new_row
 
     # Get the number of old_row 
     row_number=$(awk -v pattern="$PK" '$0 ~ pattern {print NR; exit}' "$table_name_path")
-    echo $row_number
 
     # Remove the old_row from the table and then create the new_row and replace the new_row with the old_row
     awk -v row_number="$row_number" -v new_row="$new_row" 'NR == row_number { print new_row; next } { print }' "$table_name_path" > temp.txt && mv temp.txt "$table_name_path"
