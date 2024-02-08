@@ -3,13 +3,23 @@
 database_name=$1
 database_dir=./Databases/$database_name
 
-echo "-------------------------------------"
-echo "Available Tables in $database_name:"
-ls $database_dir
-echo "-------------------------------------"
+if [[ $(ls $database_dir) ]];
+then
+  echo "-------------------------------------"
+  echo "Available Tables in $database_name:"
+  ls $database_dir
+  echo "-------------------------------------"
+
+else
+  echo "-------------------------------------"
+  echo "There is no tables found"
+  echo "-------------------------------------"
+
+  ./table_menu.sh $database_name
+fi
 
 # Ask the user for the table name
-read -p "Enter the name of the table to delete: " table_name
+read -p "Enter the name of the table to drop: " table_name
 
 result=`./check_valid_value.sh $table_name`
 
@@ -34,31 +44,35 @@ then
 else
   # Check if the file exists
 
-  read -p "Are you sure you want to delete $table_name? (y/n): " choice
+  while true;
+  do
+    read -p "Are you sure you want to delete $table_name? (y/n): " choice
+    case $choice in
 
-  case $choice in
+    [Yy] ) 
+        rm "$database_dir/$table_name"
+        rm "$database_dir/.metadata/$table_name.meta"
+        rm "$database_dir/.metadata/$table_name.dtype"
+        echo "---------------------------------------------"
+        echo "Table $table_name is deleted successfully!"
+        echo "---------------------------------------------"
+        break
+        ;;
 
-  [Yy] ) 
-      rm "$database_dir/$table_name"
-      rm "$database_dir/.metadata/$table_name.meta"
-      rm "$database_dir/.metadata/$table_name.dtype"
-      echo "---------------------------------------------"
-      echo "Table $table_name deleted successfully!"
-      echo "---------------------------------------------"
-      ;;
+    [Nn] )
+        echo "---------------------------------------------"
+        echo "Cancel delete!"
+        echo "---------------------------------------------"
+        break
+        ;;
 
-  [Nn] )
-      echo "----------------------"
-      echo "Cancel delete!"
-      echo "----------------------"
-      ;;
-
-  * ) 
-      echo "--------------------------"
-      echo "Please choose y/n"
-      echo "--------------------------"
-      ;;
-  esac
+    * ) 
+        echo "---------------------------------------------"
+        echo "Please choose y/n"
+        echo "---------------------------------------------"
+        ;;
+    esac
+  done
   
   ./table_menu.sh $database_name
 fi
