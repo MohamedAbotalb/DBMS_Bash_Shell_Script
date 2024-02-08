@@ -3,10 +3,20 @@
 database_name=$1
 database_dir=./Databases/$database_name
 
-echo "-------------------------------------"
-echo "Available Tables in $database_name:"
-ls $database_dir
-echo "-------------------------------------"
+if [[ $(ls $database_dir) ]];
+then
+  echo "-------------------------------------"
+  echo "Available Tables in $database_name:"
+  ls $database_dir
+  echo "-------------------------------------"
+  
+else
+  echo "-------------------------------------"
+  echo "There is no tables found"
+  echo "-------------------------------------"
+
+  ./table_menu.sh $database_name
+fi
 
 read -p "Enter the table name you want to delete from: " table_name
 
@@ -101,33 +111,34 @@ else
             fi
           done < "$table_name_path"
 
-          read -p "Are you sure you want to delete this row? (y/n): " choice
+          while true;
+          do
+            read -p "Are you sure you want to delete this row? (y/n): " choice
+            case $choice in
 
-          case $choice in
+            [Yy] ) 
+                sed -i "/$target_row/d" $table_name_path
+                echo "---------------------------------------------"
+                echo "Row in $table_name is table deleted successfully!"
+                echo "---------------------------------------------"
+                break 2
+                ;;
 
-          [Yy] ) 
-              sed -i "/$target_row/d" $table_name_path
-              echo "---------------------------------------------"
-              echo "Row in $table_name table deleted successfully!"
-              echo "---------------------------------------------"
-              ;;
+            [Nn] )
+                echo "----------------------"
+                echo "Cancel delete!"
+                echo "----------------------"
+                break 2
+                ;;
 
-          [Nn] )
-              echo "----------------------"
-              echo "Cancel delete!"
-              echo "----------------------"
-              ;;
-
-          * ) 
-              echo "--------------------------"
-              echo "Please choose y/n"
-              echo "--------------------------"
-              ;;
-          esac
-
-          break
+            * ) 
+                echo "--------------------------"
+                echo "Please choose y/n"
+                echo "--------------------------"
+                ;;
+            esac
+          done    
         fi
-
       else
         echo "-------------------------------------"
         echo "The value of $pk is invalid, enter a new value"
