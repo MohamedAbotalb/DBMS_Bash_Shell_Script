@@ -1,18 +1,22 @@
+4. list_databases
+
 #!/bin/bash
 
-# Check if there is a database in the Databases direcotry or not
-if [[ $(ls Databases) ]];
-then
-  echo "-------------------------------------"
-  echo "Available databases:"
-  ls Databases
-  echo "-------------------------------------"
+# List available databases
+list_databases() {
+  if [[ $(ls Databases) ]]; 
+  then
+    echo "-------------------------------------"
+    echo "Available databases:"
+    ls Databases
+    echo "-------------------------------------"
 
-else
-  echo "-------------------------------------"
-  echo "There is no Database found"
-  echo "-------------------------------------"
+  else
+    echo "-------------------------------------"
+    echo "There is no Database found"
+    echo "-------------------------------------"
+  fi
+}
 
-fi
-
+list_databases
 ./main.sh
