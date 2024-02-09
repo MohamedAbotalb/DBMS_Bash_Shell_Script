@@ -1,165 +1,176 @@
 #!/bin/bash
 
+# Global Variables
 database_name=$1
-database_dir=./Databases/$database_name
+database_dir="./Databases/$database_name"
+metadata_dir="$database_dir/.metadata"
+metadata=()
 
-if [[ $(ls $database_dir) ]];
-then
-  echo "-------------------------------------"
-  echo "Available tables in $database_name:"
-  ls $database_dir
-  echo "-------------------------------------" 
-fi
+list_available_tables() {
+  if [[ $(ls "$database_dir") ]]; 
+  then
+    echo "-------------------------------------"
+    echo "--------- Available Tables ----------"
+    ls "$database_dir"
+    echo "-------------------------------------"
+  fi
+}
 
-read -p "Enter the table name: " table_name
+get_table_name() {
+  read -p "Enter the table name: " table_name
+}
 
-result=`./check_valid_value.sh $table_name`
+check_valid_table_name() {
+  local result=$(./check_valid_value.sh "$table_name")
 
-# check if the table name is not valid
-if [[ $result ]];
-then
-  echo "-------------------------------------"
-  echo $result
-  echo "-------------------------------------"
+  if [[ $result ]]; then
+    echo "-------------------------------------"
+    echo "$result"
+    echo "-------------------------------------"
+    create_table "$database_name"
+  fi
+}
 
-  ./create_table.sh $database_name
+check_table_exists() {
+  if [[ -f "$database_dir/$table_name" ]]; 
+  then
+    echo "-------------------------------------"
+    echo "$table_name is present, please enter a new name"
+    echo "-------------------------------------"
+    create_table "$database_name"
+  fi
+}
 
-# Check if the table name is present in the selected database
-elif [[ -f $database_dir/$table_name ]];
-then
-  echo "-------------------------------------"
-  echo "$table_name is present, please enter a new name"
-  echo "-------------------------------------"
+create_metadata_dir() {
+  if [[ ! -d $metadata_dir ]] 
+  then
+    mkdir -p $metadata_dir
+  fi
+}
 
-  ./create_table.sh $database_name
+create_table_meta_path() {
+  table_name_path=$database_dir/$table_name
+  table_meta_path=$metadata_dir/$table_name
+}
 
-else
-  # The table name is valid and not found in the database
+create_table_columns() {
+  create_metadata_dir
+
   # check if the columns number is a positive decimal only
-  while true;
+  while true; 
   do
     read -p "Enter the number of columns: " columns
 
-    if [[ $columns =~ ^[1-9]+$ ]]; 
+    if [[ $columns =~ ^[1-9][0-9]*$ ]]; 
     then
-      break
-
+      break    
     else
       echo "-------------------------------------"
       echo "Invalid columns number"
       echo "-------------------------------------"
-
     fi
   done
 
-  # Declare an array to hold the columns name
-  metadata=()
-
   # Get the name of each column and check its value is valid or not and contains at least 2 characters
-  for ((i=1; i <= $columns; i++))
+  for ((i=1; i <= columns; i++)); 
   do
     while true;
     do
-      read -p "Enter the name of column $i: " name
-
       flag=0
+      read -p "Enter the name of column $i: " name
+  
       if [[ $name =~ ^[a-zA-Z]{2,}[a-zA-Z_]*$ || $name =~ *" "* ]]
-        then
-          # Check if the entered column name is present before in the table or not
-          for meta in "${metadata[@]}";
-          do
-            if [[ "$name" = "$meta" ]];
-            then
-              flag=1
-              break
-            fi
-          done
-
-          if [[ $flag = 0 ]];
+      then
+        # Check if the column name is present before in the table or not
+        for meta in "${metadata[@]}";
+        do
+          if [[ "$name" = "$meta" ]];
           then
-            metadata+=("$name")
+            flag=1
             break
-          else
-            echo "-------------------------------------"
-            echo "$name column is present before in the table, enter a new column name"
-            echo "-------------------------------------"
           fi
+        done
+
+        if [[ $flag = 0 ]];
+        then
+          metadata+=("$name")
+          break
+        else
+          echo "-------------------------------------"
+          echo "$name column is present before in the table, enter a new column name"
+          echo "-------------------------------------"
+        fi
       else
         echo "-------------------------------------"
         echo "Invalid column name"
         echo "-------------------------------------"
-
       fi
-      
     done
 
-    # set the data type for each column (string/integer)
-    # check if the datatype is not (string/integer) or the value is not entered (-z) 
-    while true;
+    # check if the datatype isn't string or integer 
+    while true; 
     do
       read -p "Enter the datatype of column $i [string/int]: " datatype
 
-      if [[ "$datatype" != *(int)*(string) || -z "$datatype" ]]
+      if [[ "$datatype" != int && "$datatype" != string ]]; 
       then
         echo "-------------------------------------"
         echo "Invalid datatype"
         echo "-------------------------------------"
-
       else
         break
-
       fi
     done
 
-    # set each column name in a file of metadata (table_name.meta)
-    # set each column datatype in a file of datatype (table_name.dtype)
-    metadata_dir="./Databases/$database_name/.metadata"
-
-    if [[ ! -d $metadata_dir ]] 
-    then
-      mkdir $metadata_dir
-    fi
-    
     if [[ i -eq $columns ]]; 
     then
-      echo $name >> $metadata_dir/$table_name.meta
-      echo $datatype >> $metadata_dir/$table_name.dtype
-
+      echo "$name" >> "$table_meta_path.meta"
+      echo "$datatype" >> "$table_meta_path.dtype"
     else
-      echo -n $name":" >> $metadata_dir/$table_name.meta
-      echo -n $datatype":" >> $metadata_dir/$table_name.dtype
+      echo -n "$name:" >> "$table_meta_path.meta"
+      echo -n "$datatype:" >> "$table_meta_path.dtype"
     fi
   done
 
-  # set the primary key to a specific column 
-  while true;
-  do
-    read -p "Choose which one is the primary key [ ${metadata[*]} ] : " result
+  set_primary_key "$table_name"
 
-    for meta in "${metadata[@]}";
-    do
-      if [[ "$result" = "$meta" ]];
-      then
-        echo "PK:"$result >> $metadata_dir/$table_name.meta
-
-        echo "-------------------------------------"
-        echo "primary key is $result"
-        echo "-------------------------------------"
-
-        break 2     
-      fi
-    done
-
-    # if the input is not match any one of the array of columns names
-    echo "-------------------------------------"
-    echo "Invalid value"
-    echo "-------------------------------------"
-  done
-  
-  touch $database_dir/$table_name
+  touch $table_name_path
   echo "-------------------------------------"
   echo "$table_name table is created successfully"
   echo "-------------------------------------"
 
-  ./table_menu.sh $database_name
-fi
+  ./table_menu.sh "$database_name"
+}
+
+set_primary_key() {
+  while true; 
+  do
+    read -p "Choose which one is the primary key [ ${metadata[*]} ] : " result
+
+    if [[ " ${metadata[@]} " =~ " $result " ]]; 
+    then
+      echo "PK:$result" >> "$table_meta_path.meta"
+      echo "-------------------------------------"
+      echo "Primary Key is $result"
+      echo "-------------------------------------"
+      break
+
+    else
+      # if the input doesn't match any one of the array of columns names
+      echo "-------------------------------------"
+      echo "Invalid value"
+      echo "-------------------------------------"
+    fi
+  done
+}
+
+create_table() {
+  list_available_tables
+  get_table_name
+  check_valid_table_name
+  check_table_exists
+  create_table_meta_path
+  create_table_columns
+}
+
+create_table

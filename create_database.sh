@@ -6,7 +6,7 @@ get_database_name() {
 
 check_valid_database() {
   local database_name="$1"
-  local result=$(./check_valid_value.sh "$database_name")
+  local result=$(./check_valid_value.sh $database_name)
 
   if [[ $result ]]; 
 	then

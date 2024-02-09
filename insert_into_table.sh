@@ -4,58 +4,70 @@ database_name=$1
 database_dir=./Databases/$database_name
 metadata_dir=$database_dir/.metadata
 
-if [[ $(ls $database_dir) ]];
-then
-  echo "-------------------------------------"
-  echo "Available Tables in $database_name:"
-  ls $database_dir
-  echo "-------------------------------------"
+list_available_tables() {
+  if [[ $(ls "$database_dir") ]]; 
+  then
+    echo "-------------------------------------"
+    echo "--------- Available Tables ----------"
+    ls "$database_dir"
+    echo "-------------------------------------"
 
-else
-  echo "-------------------------------------"
-  echo "There is no tables found"
-  echo "-------------------------------------"
+  else
+    echo "-------------------------------------"
+    echo "There are no tables found"
+    echo "-------------------------------------"
 
-  ./table_menu.sh $database_name
-fi
+    ./table_menu.sh "$database_name"
+  fi
+}
 
-read -p "Enter the table name: " table_name
+get_table_name() {
+  read -p "Enter the table name: " table_name
+}
 
-result=`./check_valid_value.sh $table_name`
+check_valid_table_name() {
+  local result=$(./check_valid_value.sh "$table_name")
 
-# check if the table name is not valid
-if [[ $result ]];
-then
-  echo "-------------------------------------"
-  echo $result
-  echo "-------------------------------------"
+  if [[ $result ]]; 
+  then
+    echo "-------------------------------------"
+    echo "$result"
+    echo "-------------------------------------"
 
-  ./insert_into_table.sh $database_name
+    insert_into_table
+  fi
+}
 
-# Check if the table name isn't present in the selected database
-elif [[ ! -f $database_dir/$table_name ]];
-then
-  echo "-------------------------------------"
-  echo "$table_name isn't present, please enter a new name"
-  echo "-------------------------------------"
+check_table_exists() {
+  if [[ ! -f "$database_dir/$table_name" ]]; 
+  then
+    echo "-------------------------------------"
+    echo "$table_name isn't present, please enter a new name"
+    echo "-------------------------------------"
 
-  ./insert_into_table.sh $database_name
+    insert_into_table
+  fi
+}
 
-else
+create_table_meta_path() {
   table_name_path=$database_dir/$table_name
-  table_meta_path=$database_dir/.metadata/$table_name
+  table_meta_path=$metadata_dir/$table_name
+}
 
+insert_data() {
   # Get the primary key value from the metadata file
-  meta=`awk 'NR==2 {print}' $table_meta_path.meta`
-  pk=$(echo "$meta" | awk -F: '{print $2}')
+  local meta=$(awk 'NR==2 {print}' "$table_meta_path.meta")
+  local pk=$(echo "$meta" | awk -F: '{print $2}')
 
   # Create an array to get the columns names from meta file
-  metadata=($(awk -F: 'NR==1 {for(i=1;i<=NF;i++) print $i}' $table_meta_path.meta))
+  local metadata=($(awk -F: 'NR==1 {for(i=1;i<=NF;i++) print $i}' "$table_meta_path.meta"))
+  local length=${#metadata[@]}
 
   # Create an array to get the columns datatypes from dtype file
-  datatypes=($(awk -F: 'NR==1 {for(i=1;i<=NF;i++) print $i}' $table_meta_path.dtype))
+  local datatypes=($(awk -F: 'NR==1 {for(i=1;i<=NF;i++) print $i}' "$table_meta_path.dtype"))
 
   # Read the second line and get the index of the value after ":"
+  local index
   for((i=0; i < ${#metadata[@]}; i++)) 
   do
     if [[ "$pk" = "${metadata[$i]}" ]];
@@ -66,20 +78,18 @@ else
   done
 
   # Create an array to get the real data of primary key column in table file to compare the inserted PK value with them to disallow duplicates
-  pk_values=($(awk -F: "{print \$($index+1)}" "$table_name_path"))
+  local pk_values=($(awk -F: "{print \$($index+1)}" "$table_name_path"))
 
   # Ask the user to insert the data for each column
-  real_data=()
-  length=${#metadata[@]}
-
+  local real_data=()
   for((i=0; i < $length; i++)) 
   do
-    name="${metadata[$i]}"
-    type="${datatypes[$i]}"
+    local name="${metadata[$i]}"
+    local type="${datatypes[$i]}"
 
     while true; 
     do
-      # check if the column is the primary key
+      # check if the column is the primary key or not
       if [[ "$name" = "$pk" ]]; then
         read -p "Enter the value of Primary Key [$name]: " value
       else
@@ -88,25 +98,24 @@ else
 
       if [[ $type = "int" && "$value" = +([0-9]) || $type = "string" && "$value" = +([a-zA-Z@.]) ]]; 
       then
+        # Check for duplicate primary key value
+        flag=0
+        for val in "${pk_values[@]}"; 
+        do
+          if [[ "$val" = "$value" ]]; then
+            flag=1
+            echo "-------------------------------------"
+            echo "This value of Primary Key is present before, please enter a new $name value"
+            echo "-------------------------------------"
+            break 
+          fi
+        done
 
-      # Check for duplicate primary key value
-      flag=0
-      for val in "${pk_values[@]}"; 
-      do
-        if [[ "$val" = "$value" ]]; then
-          flag=1
-          echo "-------------------------------------"
-          echo "This value of Primary Key is present before, please enter a new $name value"
-          echo "-------------------------------------"
-          break 
+        if [[ "$flag" = "0" ]]; 
+        then
+          real_data+=("$value")
+          break  
         fi
-      done
-
-      if [[ "$flag" = "0" ]]; 
-      then
-        real_data+=("$value")
-        break  
-      fi
       else
         echo "-------------------------------------"
         echo "Invalid input, please enter a valid $name value"
@@ -127,9 +136,19 @@ else
   done
 
   echo "-------------------------------------"
-  echo "Data Inserted Successfully"
+  echo "Data is Inserted Successfully"
   echo "-------------------------------------"
 
-  ./table_menu.sh $database_name
+  ./table_menu.sh "$database_name"
+}
 
-fi
+insert_into_table() {
+  list_available_tables
+  get_table_name
+  check_valid_table_name
+  check_table_exists
+  create_table_meta_path
+  insert_data
+}
+
+insert_into_table
