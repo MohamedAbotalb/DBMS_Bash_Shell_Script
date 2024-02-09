@@ -2,11 +2,22 @@
 
 # List available databases
 list_databases() {
-  echo "-------------------------------------"
-  echo "Available Databases:"
-  ls ./Databases
-  echo "-------------------------------------"
+  if [[ $(ls Databases) ]]; 
+  then
+    echo "-------------------------------------"
+    echo "-------- Available Databases --------"
+    ls Databases
+    echo "-------------------------------------"
+
+  else
+    echo "-------------------------------------"
+    echo "---- There is no Database found -----"
+    echo "-------------------------------------"
+
+    ./main.sh
+  fi
 }
+
 
 # Ask the user to enter database name
 get_database_name() {
