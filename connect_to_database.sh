@@ -1,5 +1,23 @@
 #!/bin/bash
 
+# List available databases
+list_databases() {
+  if [[ $(ls Databases) ]]; 
+  then
+    echo "-------------------------------------"
+    echo "-------- Available databases --------"
+    ls Databases
+    echo "-------------------------------------"
+
+  else
+    echo "-------------------------------------"
+    echo "---- There is no Database found -----"
+    echo "-------------------------------------"
+
+    ./main.sh
+  fi
+}
+
 get_database_name() {
   read -p "Enter name of database: " database_name
 }
@@ -43,6 +61,7 @@ connect_to_database() {
 
 # Get the database name and connect to it
 main() {
+  list_databases
   get_database_name
   check_valid_database "$database_name"
   check_database_exists "$database_name"
