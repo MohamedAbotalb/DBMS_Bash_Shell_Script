@@ -36,7 +36,6 @@ connect_to_database() {
   local database_name="$1"
 
   cd "./Databases/$database_name"
-  echo "-------------------------------------"
   cd ../..
   
   ./table_menu.sh "$database_name"

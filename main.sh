@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "-------------------------------------"
-echo "WELCOME TO BASH SCRIPT DBMS:"
+echo "---- WELCOME TO BASH SCRIPT DBMS ----"
 echo "-------------------------------------"
 
 PS3="Choose what you want: "
