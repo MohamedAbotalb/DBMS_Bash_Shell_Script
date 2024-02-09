@@ -3,76 +3,87 @@
 database_name=$1
 database_dir=./Databases/$database_name
 
-if [[ $(ls $database_dir) ]];
-then
-  echo "-------------------------------------"
-  echo "Available Tables in $database_name:"
-  ls $database_dir
-  echo "-------------------------------------"
+list_available_tables() {
+  if [[ $(ls "$database_dir") ]]; then
+    echo "-------------------------------------"
+    echo "--------- Available Tables ----------"
+    ls "$database_dir"
+    echo "-------------------------------------"
+  else
+    echo "-------------------------------------"
+    echo "There are no tables found"
+    echo "-------------------------------------"
+    ./table_menu.sh "$database_name"
+  fi
+}
 
-else
-  echo "-------------------------------------"
-  echo "There is no tables found"
-  echo "-------------------------------------"
+get_table_name() {
+  read -p "Enter the table name: " table_name
+}
 
-  ./table_menu.sh $database_name
-fi
+check_valid_table_name() {
+  local result=$(./check_valid_value.sh "$table_name")
 
-# Ask the user for the table name
-read -p "Enter the name of the table to drop: " table_name
+  if [[ $result ]]; 
+  then
+    echo "-------------------------------------"
+    echo "$result"
+    echo "-------------------------------------"
 
-result=`./check_valid_value.sh $table_name`
+    drop_table
+  fi
+}
 
-# check if the table name is not valid
-if [[ $result ]];
-then
-  echo "-------------------------------------"
-  echo $result
-  echo "-------------------------------------"
+check_table_exists() {
+  if [[ ! -f "$database_dir/$table_name" ]]; 
+  then
+    echo "-------------------------------------"
+    echo "$table_name isn't present, please enter a new name"
+    echo "-------------------------------------"
 
-  ./drop_table.sh $database_name
+    drop_table
+  fi
+}
 
-# Check if the table name isn't present in the selected database
-elif [[ ! -f $database_dir/$table_name ]];
-then
-  echo "-------------------------------------"
-  echo "$table_name isn't present, please enter a new name"
-  echo "-------------------------------------"
-
-  ./drop_table.sh $database_name
-
-else
-  # Check if the file exists
-
-  while true;
+confirm_delete_table() {
+  while true; 
   do
     read -p "Are you sure you want to delete $table_name? (y/n): " choice
     case $choice in
-
-    [Yy] ) 
-        rm "$database_dir/$table_name"
-        rm "$database_dir/.metadata/$table_name.meta"
-        rm "$database_dir/.metadata/$table_name.dtype"
-        echo "---------------------------------------------"
-        echo "Table $table_name is deleted successfully!"
-        echo "---------------------------------------------"
-        break
+      [Yy])
+        delete_table
         ;;
-
-    [Nn] )
+      [Nn])
         echo "---------------------------------------------"
         echo "Cancel delete!"
         echo "---------------------------------------------"
         break
         ;;
-
-    * ) 
+      *)
         echo "---------------------------------------------"
         echo "Please choose y/n"
         echo "---------------------------------------------"
         ;;
     esac
   done
-  
-  ./table_menu.sh $database_name
-fi
+}
+
+delete_table() {
+  rm "$database_dir/$table_name"
+  rm "$database_dir/.metadata/$table_name.meta"
+  rm "$database_dir/.metadata/$table_name.dtype"
+  echo "---------------------------------------------"
+  echo "Table $table_name is deleted successfully!"
+  echo "---------------------------------------------"
+}
+
+drop_table() {
+  list_available_tables
+  read_table_name
+  check_valid_table_name
+  check_table_exists
+  confirm_delete_table
+  ./table_menu.sh "$database_name"
+}
+
+drop_table
