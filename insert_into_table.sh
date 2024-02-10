@@ -54,31 +54,38 @@ create_table_meta_path() {
   table_meta_path=$metadata_dir/$table_name
 }
 
-insert_data() {
-  # Get the primary key value from the metadata file
-  local meta=$(awk 'NR==2 {print}' "$table_meta_path.meta")
-  local pk=$(echo "$meta" | awk -F: '{print $2}')
+# Create an array to get the columns names and datatypes from meta and dtype files
+get_metadata_and_datatypes() {
+  metadata=($(awk -F: 'NR==1 {for(i=1;i<=NF;i++) print $i}' $table_meta_path.meta))
+  datatypes=($(awk -F: 'NR==1 {for(i=1;i<=NF;i++) print $i}' $table_meta_path.dtype))
+}
 
-  # Create an array to get the columns names from meta file
-  local metadata=($(awk -F: 'NR==1 {for(i=1;i<=NF;i++) print $i}' "$table_meta_path.meta"))
-  local length=${#metadata[@]}
+# Get the primary key value from the metadata file
+get_pk_name() {
+  meta=$(awk 'NR==2 {print}' $table_meta_path.meta)
+  pk=$(echo "$meta" | awk -F: '{print $2}')
+}
 
-  # Create an array to get the columns datatypes from dtype file
-  local datatypes=($(awk -F: 'NR==1 {for(i=1;i<=NF;i++) print $i}' "$table_meta_path.dtype"))
-
-  # Read the second line and get the index of the value after ":"
-  local index
-  for((i=0; i < ${#metadata[@]}; i++)) 
+# Read the second line and get the index of the primary key
+get_pk_index() {
+  index=""
+  for ((i=0; i < ${#metadata[@]}; i++)); 
   do
-    if [[ "$pk" = "${metadata[$i]}" ]];
+    if [[ "$pk" = "${metadata[$i]}" ]]; 
     then
       index=$i
       break
     fi
   done
+}
 
-  # Create an array to get the real data of primary key column in table file to compare the inserted PK value with them to disallow duplicates
-  local pk_values=($(awk -F: "{print \$($index+1)}" "$table_name_path"))
+# Get the primary key values to check if the entered value is present or not
+get_pk_values() {
+  pk_values=($(awk -F: "{print \$($index+1)}" "$table_name_path"))
+}
+
+insert_data() {
+  local length=${#metadata[@]}
 
   # Ask the user to insert the data for each column
   local real_data=()
@@ -148,6 +155,10 @@ insert_into_table() {
   check_valid_table_name
   check_table_exists
   create_table_meta_path
+  get_metadata_and_datatypes
+  get_pk_name
+  get_pk_index
+  get_pk_values
   insert_data
 }
 

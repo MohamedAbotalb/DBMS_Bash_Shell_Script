@@ -64,6 +64,41 @@ check_data_presence() {
   fi
 }
 
+# Create an array to get the columns names and datatypes from meta and dtype files
+get_metadata_and_datatypes() {
+  metadata=($(awk -F: 'NR==1 {for(i=1;i<=NF;i++) print $i}' $table_meta_path.meta))
+  datatypes=($(awk -F: 'NR==1 {for(i=1;i<=NF;i++) print $i}' $table_meta_path.dtype))
+}
+
+# Get the primary key value from the metadata file
+get_pk_name() {
+  meta=$(awk 'NR==2 {print}' $table_meta_path.meta)
+  pk=$(echo "$meta" | awk -F: '{print $2}')
+}
+
+# Read the second line and get the index of the primary key
+get_pk_index() {
+  index=""
+  for ((i=0; i < ${#metadata[@]}; i++)); 
+  do
+    if [[ "$pk" = "${metadata[$i]}" ]]; 
+    then
+      index=$i
+      break
+    fi
+  done
+}
+
+# Get the primary key values to check if the entered value is present or not
+get_pk_values() {
+  pk_values=($(awk -F: "{print \$($index+1)}" "$table_name_path"))
+}
+
+# Get the datatype value for the PK
+get_pk_dtype() {
+  dtype="${datatypes[$index]}"
+}
+
 select_all_rows() {
   echo "-------------------------------------"
   head -1 $table_meta_path.meta
@@ -75,26 +110,9 @@ select_all_rows() {
 }
 
 select_specific_row() {
-  # Get the primary key value from the metadata file
-  local meta=$(awk 'NR==2 {print}' $table_meta_path.meta)
-  local pk=$(echo "$meta" | awk -F: '{print $2}')
-
-  # Create arrays for column names and data types
-  local metadata=($(awk -F: 'NR==1 {for(i=1;i<=NF;i++) print $i}' $table_meta_path.meta))
-  local datatypes=($(awk -F: 'NR==1 {for(i=1;i<=NF;i++) print $i}' $table_meta_path.dtype))
-
-  # Read the second line and get the index of the primary key
-  local index
-  for ((i=0; i < ${#metadata[@]}; i++)); 
-  do
-    if [[ "$pk" = "${metadata[$i]}" ]]; 
-    then
-      index=$i
-      break
-    fi
-  done
-
-  local dtype="${datatypes[$index]}"
+  get_pk_name
+  get_pk_index
+  get_pk_dtype
 
   while true; 
   do
@@ -102,8 +120,7 @@ select_specific_row() {
 
     if [[ $dtype = "int" && "$PK" = +([0-9]) || $dtype = "string" && "$PK" = +([a-zA-Z@.]) ]]; 
     then
-      # Get the primary key values to check if the entered value is present or not
-      local pk_values=($(awk -F: "{print \$($index+1)}" "$table_name_path"))
+      get_pk_values
 
       local flag=0
       for val in "${pk_values[@]}"; 
@@ -153,6 +170,7 @@ select_from_table() {
   check_table_exists
   create_table_meta_path
   check_data_presence
+  get_metadata_and_datatypes
 }
 
 select_from_table
