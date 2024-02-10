@@ -5,7 +5,7 @@ echo "---- WELCOME TO BASH SCRIPT DBMS ----"
 echo "-------------------------------------"
 
 PS3="Choose what you want: "
-select choice in "Create Database" "List Databases" "Connect to a Database" "Drop a Database" "Quit"
+select choice in "Create Database" "List Databases" "Connect to Database" "Drop Database" "Quit"
 do
   case $REPLY in
   # Create New Database 
