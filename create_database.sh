@@ -7,7 +7,6 @@ create() {
   echo "-------------------------------------"
   echo "$database_name Database is created successfully"
   echo "-------------------------------------"
-  ./main.sh
 }
 
 main() {
@@ -16,6 +15,7 @@ main() {
   check_valid_database $database_name
   check_database_presence_to_create $database_name
   create
+  ./main.sh
 }
 
 main
