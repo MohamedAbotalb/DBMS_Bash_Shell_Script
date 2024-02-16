@@ -11,8 +11,8 @@ connect() {
 main() {
   list_databases
   get_database_name
-  check_valid_database $database_name
-  check_database_presence_to_connect $database_name
+  check_valid_database
+  check_database_presence_to_connect
   connect
   ./table_menu.sh $database_name
 }
