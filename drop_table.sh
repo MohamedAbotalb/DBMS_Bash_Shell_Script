@@ -22,7 +22,7 @@ get_table_name() {
 }
 
 check_valid_table_name() {
-  local result=$(./check_valid_value.sh "$table_name")
+  local result=$(./check_valid_value.sh $table_name)
 
   if [[ $result ]]; 
   then
@@ -52,6 +52,7 @@ confirm_delete_table() {
     case $choice in
       [Yy])
         delete_table
+        break
         ;;
       [Nn])
         echo "---------------------------------------------"
@@ -79,7 +80,7 @@ delete_table() {
 
 drop_table() {
   list_available_tables
-  read_table_name
+  get_table_name
   check_valid_table_name
   check_table_exists
   confirm_delete_table

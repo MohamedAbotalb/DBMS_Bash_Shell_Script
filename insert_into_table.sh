@@ -26,7 +26,7 @@ get_table_name() {
 }
 
 check_valid_table_name() {
-  local result=$(./check_valid_value.sh "$table_name")
+  local result=$(./check_valid_value.sh $table_name)
 
   if [[ $result ]]; 
   then
