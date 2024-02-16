@@ -5,7 +5,6 @@ get_database_name() {
 }
 
 check_valid_database() {
-  local database_name=$1
   local result=$(./check_valid_value.sh $database_name)
 
   if [[ $result ]]; 
@@ -19,7 +18,6 @@ check_valid_database() {
 }
 
 check_database_presence_to_create() {
-  local database_name=$1
   local database_dir=./Databases/$database_name
 
   if [[ -d "$database_dir" ]]; 
@@ -33,7 +31,6 @@ check_database_presence_to_create() {
 }
 
 check_database_presence_to_connect() {
-  local database_name=$1
   local database_dir=./Databases/$database_name
 
   if [[ ! -d "$database_dir" ]]; 
@@ -62,9 +59,8 @@ list_databases() {
 }
 
 confirm_delete_database() {
-  local database_name=$1
   local database_dir=./Databases/$database_name
-
+  
   while true; 
   do
     read -p "Are you Sure You Want To delete $database_name Database? y/n " choice
