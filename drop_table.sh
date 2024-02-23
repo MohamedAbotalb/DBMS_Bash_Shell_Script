@@ -1,57 +1,15 @@
 #!/bin/bash
 
-database_name=$1
-database_dir=./Databases/$database_name
-
-list_available_tables() {
-  if [[ $(ls "$database_dir") ]]; then
-    echo "-------------------------------------"
-    echo "--------- Available Tables ----------"
-    ls "$database_dir"
-    echo "-------------------------------------"
-  else
-    echo "-------------------------------------"
-    echo "There are no tables found"
-    echo "-------------------------------------"
-    ./table_menu.sh "$database_name"
-  fi
-}
-
-get_table_name() {
-  read -p "Enter the table name: " table_name
-}
-
-check_valid_table_name() {
-  local result=$(./check_valid_value.sh "$table_name")
-
-  if [[ $result ]]; 
-  then
-    echo "-------------------------------------"
-    echo "$result"
-    echo "-------------------------------------"
-
-    drop_table
-  fi
-}
-
-check_table_exists() {
-  if [[ ! -f "$database_dir/$table_name" ]]; 
-  then
-    echo "-------------------------------------"
-    echo "$table_name isn't present, please enter a new name"
-    echo "-------------------------------------"
-
-    drop_table
-  fi
-}
+source table_functions.sh
 
 confirm_delete_table() {
   while true; 
   do
-    read -p "Are you sure you want to delete $table_name? (y/n): " choice
+    read -p "Are you sure you want to delete $table_name table? (y/n): " choice
     case $choice in
       [Yy])
         delete_table
+        break
         ;;
       [Nn])
         echo "---------------------------------------------"
@@ -79,11 +37,11 @@ delete_table() {
 
 drop_table() {
   list_available_tables
-  read_table_name
-  check_valid_table_name
-  check_table_exists
+  get_table_name
+  check_valid_table_name || drop_table
+  check_table_exists || drop_table
   confirm_delete_table
-  ./table_menu.sh "$database_name"
+  ./table_menu.sh $database_name
 }
 
 drop_table
