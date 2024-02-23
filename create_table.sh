@@ -1,10 +1,6 @@
 #!/bin/bash
 
-# Global Variables
-database_name=$1
-database_dir="./Databases/$database_name"
-metadata_dir="$database_dir/.metadata"
-metadata=()
+source table_functions.sh
 
 list_available_tables() {
   if [[ $(ls "$database_dir") ]]; 
@@ -16,28 +12,13 @@ list_available_tables() {
   fi
 }
 
-get_table_name() {
-  read -p "Enter the table name: " table_name
-}
-
-check_valid_table_name() {
-  local result=$(./check_valid_value.sh $table_name)
-
-  if [[ $result ]]; then
-    echo "-------------------------------------"
-    echo "$result"
-    echo "-------------------------------------"
-    create_table "$database_name"
-  fi
-}
-
 check_table_exists() {
-  if [[ -f "$database_dir/$table_name" ]]; 
+  if [[ -f $database_dir/$table_name ]]; 
   then
     echo "-------------------------------------"
     echo "$table_name is present, please enter a new name"
     echo "-------------------------------------"
-    create_table "$database_name"
+    create_table 
   fi
 }
 
@@ -46,11 +27,6 @@ create_metadata_dir() {
   then
     mkdir -p $metadata_dir
   fi
-}
-
-create_table_meta_path() {
-  table_name_path=$database_dir/$table_name
-  table_meta_path=$metadata_dir/$table_name
 }
 
 create_table_columns() {
@@ -132,14 +108,14 @@ create_table_columns() {
     fi
   done
 
-  set_primary_key "$table_name"
+  set_primary_key
 
   touch $table_name_path
   echo "-------------------------------------"
   echo "$table_name table is created successfully"
   echo "-------------------------------------"
 
-  ./table_menu.sh "$database_name"
+  ./table_menu.sh $database_name
 }
 
 set_primary_key() {
@@ -167,8 +143,8 @@ set_primary_key() {
 create_table() {
   list_available_tables
   get_table_name
-  check_valid_table_name
-  check_table_exists
+  check_valid_table_name || create_table
+  check_table_exists 
   create_table_meta_path
   create_table_columns
 }
