@@ -1,12 +1,16 @@
 #!/bin/bash
 
-# Global Variables
-database_name=$1
-database_dir=./Databases/$database_name
-metadata_dir=$database_dir/.metadata
+# Database directory
+database_dir="./Databases/$database_name"
+
+# Metadata directory
+metadata_dir="$database_dir/.metadata"
+
+# Array to store metadata and datatypes
 metadata=()
 pk_values=()
 
+# Function to list available tables
 list_available_tables() {
   if [[ $(ls $database_dir) ]]; 
   then
@@ -23,12 +27,13 @@ list_available_tables() {
   fi
 }
 
+# Function to get table name
 get_table_name() {
   read -p "Enter the table name: " table_name
 }
 
+# Function to check if the table name is valid
 check_valid_table_name() {
-
   local result=$(./check_valid_value.sh $table_name)
 
   if [[ $result ]]; 
@@ -41,6 +46,7 @@ check_valid_table_name() {
   fi
 }
 
+# Function to check if the table exists
 check_table_exists() {
   if [[ ! -f "$database_dir/$table_name" ]]; 
   then
@@ -51,24 +57,25 @@ check_table_exists() {
   fi
 }
 
+# Function to create table meta path
 create_table_meta_path() {
   table_name_path=$database_dir/$table_name
   table_meta_path=$metadata_dir/$table_name
 }
 
-# Create an array to get the columns names and datatypes from meta and dtype files
+# Function to get metadata and datatypes
 get_metadata_and_datatypes() {
   metadata=($(awk -F: 'NR==1 {for(i=1;i<=NF;i++) print $i}' $table_meta_path.meta))
   datatypes=($(awk -F: 'NR==1 {for(i=1;i<=NF;i++) print $i}' $table_meta_path.dtype))
 }
 
-# Get the primary key value from the metadata file
+# Function to get primary key name
 get_pk_name() {
   meta=$(awk 'NR==2 {print}' $table_meta_path.meta)
   pk=$(echo "$meta" | awk -F: '{print $2}')
 }
 
-# Read the second line and get the index of the primary key
+# Function to get primary key index
 get_pk_index() {
   index=""
   for ((i=0; i < ${#metadata[@]}; i++)); 
@@ -81,16 +88,17 @@ get_pk_index() {
   done
 }
 
-# Get the primary key values to check if the entered value is present or not
+# Function to get primary key values
 get_pk_values() {
   pk_values=($(awk -F: "{print \$($index+1)}" "$table_name_path"))
 }
 
-# Get the datatype value for the PK
+# Function to get primary key datatype
 get_pk_dtype() {
   dtype="${datatypes[$index]}"
 }
 
+# Function to check if the table is empty
 check_data_presence() {
   if [[ ! -s $table_name_path ]]; 
   then
@@ -102,6 +110,7 @@ check_data_presence() {
   fi
 }
 
+# Function to get target row
 get_target_row() {
   while IFS=: read -r -a fields; 
   do
